@@ -3,10 +3,11 @@ This demo project shows you how to integrate the CUE Audio Live Event SDK into y
 
 ## Installation 
 ### Install **CocoaPods**, and the CocoaPods *Artifactory* plugin:
-    ```
-    brew install cocoapods
-    gem install cocoapods-art
-    ```
+
+```
+brew install cocoapods
+gem install cocoapods-art
+```
 
 ### Download CUE Frameworks
 In your local file system, locate the file `~/.netrc` (create if necessary) and insert your credentials, provided by CUE:
