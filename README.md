@@ -1,14 +1,12 @@
-# CUE Live Implementation (iOS)
+# CUE Live Demo Objective C
 This demo project shows you how to integrate the CUE Audio Live Event SDK into your application.
 
-## (1) Project Settings
-
-Within your app target's `Build Phases`, add the following frameworks into `Link Binary With Libraries`:
-
-     • Accelerate.framework
-     • libc++.tbd
-
-Within your Podfile, add the following:
+## Installation 
+### Install **CocoaPods**, and the CocoaPods *Artifactory* plugin:
+    ```
+    brew install cocoapods
+    gem install cocoapods-art
+    ```
 
 ### Download CUE Frameworks
 In your local file system, locate the file `~/.netrc` (create if necessary) and insert your credentials, provided by CUE:
@@ -19,122 +17,55 @@ login <myusername>
 password <mypassword>
 ```
 
-Next, navigate to your project root using the command line. Execute this command to get access to CUE Frameworks:
+Next, navigate to your project root using the command line. Execute this command to get access to CUE Frameworks and install the pod:
 
 `pod repo-art add cocoapods-local "https://cueaudio.jfrog.io/cueaudio/api/pods/cocoapods-local"`
 
-Next, add the following to your Podfile:
+`pod install`
 
-```
-  pod "lottie-ios", '3.3.0'
-  pod "CUELive-framework", '~> 3.0'
-  pod "CUELive-bundle-Default", '~> 3.0'
-  pod "engine", '~> 1.14'
-  pod 'CUEBluetooth'
-  pod 'TrueTime', '5.0.3'
-  pod 'ReachabilitySwift', '5.0.0'
-  pod 'MQTTClient', '0.15.3'
-```
-
-Now, add the following to the top of your Podfile:
-
-```
-plugin 'cocoapods-art', :sources => [
-  'cocoapods-local'
-]
-```
-
-Finally, add the follwing to the bottom of your Podfile (after the final `end`):
-
-```
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    if target.name == "lottie-ios"
-      target.build_configurations.each do |config|
-        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-      end
-    end
-  end
- end
-```
-
+### How to update pod versions later
 In the future, to update pod versions, execute the following:
 
 `pod repo-art update cocoapods-local`
 
 `pod install`
 
-If you do not use Pods, CUE can provide files directly.
+## Demo Project
+To run the demo project, please open **CUEControllerDemo.xcworkspace** in XCode and run. 
 
 ### Build Settings
 
-Next, in your target’s **Build Settings**, add `-ObjC` to **Other Linker Flags**.
+Please check your target’s **Build Settings**, item **Other Linker Flags**, it should contain `-ObjC`flag.
 
 ![Linker Flags](https://s3.amazonaws.com/cue-sdk-integration/linker-flags.png)
 
-## (2) Edit Info.plist
+### Possible signing issue
+When demo project is built first time the signing issue may be occured: *"Signing for "CUELive-bundle-Default-CUELive" requires a development team. Select a development team in the Signing & Capabilities editor."*
 
-#### We require:
-	• NSMicrophoneUsageDescription ("To sync to the music!")
-	• NSPhotoLibraryUsageDescription ("To take photos and video of the show!")
-	• NSPhotoLibraryAddUsageDescription ("To save photos and video of the show!")
-	• NSCameraUsageDescription ("To take photos and video of the show!")
-	
-![Info.plist](https://s3.amazonaws.com/cue-sdk-integration/info-plist.png)	
+In this case:
+1. Select "Pods" item in Project Navigator.
+2. Select for target "CUELive-bundle-Default-CUELive" tab "Signing and Capabilities".
+3. Choose correct "Team" value for code signing.
 
-##Integration
+![Linker Flags](https://s3.amazonaws.com/cue-sdk-integration/code-signing.png)
 
-#### ***Swift***
+***Now the demo project is ready to be used!***
+
+## Integration
 
 Simply execute the following code:
 
 ```
-// MARK: CUE Audio
-    
-    @IBAction func launchLightShowGUI(_ sender: Any) {
-        let initialController = NavigationManager.initialController()
-        initialController.modalPresentationStyle = .overFullScreen
-        present(initialController, animated: true)
+//Launch Light Show W/ GUI    
+
+    - (IBAction)launchLightShowGUI:(id)sender {
+        UIViewController *initialController = [SwiftHelper getInitialViewController];
+        initialController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+        [self presentViewController:initialController animated:YES completion:NULL];
     }
 ```
 
-#### ***Obj-C***
-
-Add the `SwiftFile.swift` from the Obj-C Demo Project into your project. The contents consist of the following:
-
-```
-import Foundation
-import CUELive
-
-@objc class SwiftHelper: NSObject {
-
-    @objc static func getInitialViewController() -> UIViewController {
-        return NavigationManager.initialController()
-    }
-}
-``` 
-
-Next, in the `ViewController` from which you will launch the GUI, import the following:
-
-```
-#import "YourProjectName-Swift.h"
-```
-
-Next, execute the following code:
-
-```
-#pragma mark CUE Audio
-
-//Launch Light Show W/ GUI
-- (IBAction)launchLightShowGUI:(id)sender {
-    UIViewController *initialController = [SwiftHelper getInitialViewController];
-    initialController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    [self presentViewController:initialController animated:YES completion:NULL];
-}
-
-```
-
-Make sure that the CUE ViewController is full screen. If it is not completely full screen, this can lead to crashes related to the CUE camera button and delegates.
+Make sure that the CUE ViewController is **full screen**. If it is not completely full screen, this can lead to crashes related to the CUE camera button and delegates.
 
 ## Configuration
 
@@ -153,24 +84,11 @@ The API Key also lets CUE modify the branding of a client remotely (on versions 
 
 
 **If you hardcode your client API key:**
-#### ***Swift***
-``` swift
-CUEMultiDownloader.fetchCUETheme()
-```
-
-#### ***Obj-C***
 ``` objectivec
 [CUEMultiDownloader fetchCUETheme];
 ```
 
 **If you set your API Key remotely:**
-#### ***Swift***
-``` swift
-ApiKeyService.setup(apiKey: <#myClientApiKey#>)
-CUEMultiDownloader.fetchCUETheme()
-```
-
-#### ***Obj-C***
 ``` objectivec
 [ApiKeyService setupWithApiKey:<#myClientApiKey#>];
 [CUEMultiDownloader fetchCUETheme];
@@ -178,52 +96,20 @@ CUEMultiDownloader.fetchCUETheme()
 
 Note: If you pull your client API Key from the server, it should be cached (e.g., `UserDefaults`) so that the user can access the light show even without a network connection. 
 
-###Uses Microphone
-The `usesMicrophone` flag determines if microphone access will be requsted. If set to `NO`, this portion of the onboarding is removed. Also, the `Demo` tab is removed from the Side Menu, since this requires microphone access.
-
-###Has Exit
-The `hasExit` flag determines if the `Exit` button will be included in the CUE navigation menu. 
-
-###Has Exit On Homescreen
-The `hasExitOnHomescreen` flag determines if there should be an `X` button in the top right-hand corner of the homescreen to exit the CUE portion of your app. This is separate from 
-
-###Font
-You can overwrite the CUE font by replacing the `preferredFontPostScriptName` value with the `Post Script Name` of the font you wish the CUE SDK to use. 
-
-###Primary Color
-`primaryColor` is the theme color of the CUE SDK. This can be configured by CUE remotely as long as this app utilizes a unique API Key. 
-
-###Navigation Header Images
-In `CUELive.bundle` there is both `headerImage.png` and an optional `headerBackgroundImage.jpg` both can be overwritten to change the apperence of the CUE navigation.
-
-###Deprecated values
-`secondaryColor` is deprecated as of version `2.0`.
-`clientId` is deprecated as of version `2.0`.
-`hasBackgroundImage` is deprecated as of version `2.0`.
-
-## Demo Project
-To run the demo project, simply open the project and run. If you get any compiler errors, you will be able to solve them by setting up repo-art using the implementation instructions above and running: 
-
-```
-rm -rf Pods/
-rm -rf Podfile.lock
-pod install
-```
-
 # QA
 
 ## Manual Script
 
 * Once the CUE SDK is integrated and your project successfully compiles, launch the CUE portion of your app.
 
-* On the homescreen, please press the camera button to take a photo. Next, hold the button for at least three seconds to take a video. The photo and video should save successfully to your photos. 
+* On the homescreen, please press the camera button to take a photo / start capture video. The photo and video should save successfully to your photos. 
 
 * In the navigation menu, make sure the correct menu items are listed. 
-	* Live
-	* Demo
-	* Help
-	* Info
-	* Exit (iOS only)
+    * Live
+    * Demo
+    * Help
+    * Info
+    * Exit (iOS only)
 
 * Next, go to `Demo`. Complete the demo for all the services listed, which can be up to three items: `Light Show`, `Selfie Cam`, and `Trivia`. 
 
@@ -238,4 +124,3 @@ rm -rf Podfile.lock
 pod repo-art update cocoapods-local
 pod install
 ```
-
