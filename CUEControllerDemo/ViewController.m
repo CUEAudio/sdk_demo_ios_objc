@@ -9,15 +9,7 @@
 #import "ViewController.h"
 #import <CUEControllerDemo-Swift.h>
 
-// If using CUE BLE, import the following
-#import <CUEBluetooth/CUEBroadcastClient.h>
-#import <CUELive/CUEClientConfig.h>
-#import <CUELive/CueNotificationsHelper.h>
-
-@interface ViewController() <CUETriggerReceiverDelegate>
-
-// If using CUE BLE, add this property
-@property CUEBroadcastClient *broadcastClient;
+@interface ViewController ()
 
 @end
 
@@ -39,21 +31,6 @@
     UIViewController *initialController = [SwiftHelper getInitialViewController];
     initialController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self presentViewController:initialController animated:YES completion:NULL];
-}
-
-# pragma mark CUEBroadcastClient
-
-- (IBAction)startCueBleScanning:(id)sender {
-    
-    // This code should be called at the appropriate time, at it may trigger a Bluetooth Permission Request from the user
-    
-    self.broadcastClient = [[CUEBroadcastClient alloc] initWithServiceUuid:[[CUEClientConfig sharedInstance] cueBroadcastServiceUuid]];
-    self.broadcastClient.delegate = self;
-    [self.broadcastClient start];
-}
-
-- (void)didDetectTrigger:(nonnull NSString *) trigger {
-    [[CueNotificationsHelper sharedInstance] handleDetectedBleTrigger:trigger];
 }
 
 @end
