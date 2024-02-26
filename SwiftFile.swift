@@ -14,4 +14,8 @@ import CUELive
     @objc static func getInitialViewController() -> UIViewController {
         return NavigationManager.initialController()
     }
+    
+    @objc static func getInitialViewController(_ extraData: NSDictionary) -> UIViewController {
+        return NavigationManager.initialController(extraData: extraData)
+    }
 }
